@@ -42,6 +42,39 @@ private class PrivateXMLHandler {
 
     let hasAssetDefinition: Bool
 
+    var nameHtmlString: String {
+        let lang = getLang()
+        //hhh move to bottom where we keep all the xpath expressions together
+        //hhh fallback to first if not found
+        if let nameElement = xml.at_xpath("/token/appearance/name[@lang='\(lang)']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces) {
+            return nameElement.innerHTML ?? ""
+        } else {
+            return ""
+        }
+    }
+
+    var introductionHtmlString: String {
+        let lang = getLang()
+        //hhh move to bottom where we keep all the xpath expressions together
+        //hhh fallback to first if not found
+        if let introductionElement = xml.at_xpath("/token/appearance/introduction[@lang='\(lang)']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces) {
+            return introductionElement.innerHTML ?? ""
+        } else {
+            return ""
+        }
+    }
+
+    var instructionsHtmlString: String {
+        let lang = getLang()
+        //hhh move to bottom where we keep all the xpath expressions together
+        //hhh fallback to first if not found
+        if let instructionElement = xml.at_xpath("/token/appearance/instruction[@lang='\(lang)']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces) {
+            return instructionElement.innerHTML ?? ""
+        } else {
+            return ""
+        }
+    }
+
     init(contract: String, assetDefinitionStore store: AssetDefinitionStore?) {
         contractAddress = contract.add0x.lowercased()
         let assetDefinitionStore = store ?? AssetDefinitionStore()
@@ -174,6 +207,19 @@ public class XMLHandler {
     var hasAssetDefinition: Bool {
         return privateXMLHandler.hasAssetDefinition
     }
+
+    var nameHtmlString: String {
+        return privateXMLHandler.nameHtmlString
+    }
+
+    var introductionHtmlString: String {
+        return privateXMLHandler.introductionHtmlString
+    }
+
+    var instructionsHtmlString: String {
+        return privateXMLHandler.instructionsHtmlString
+    }
+
 
     init(contract: String, assetDefinitionStore: AssetDefinitionStore? = nil) {
         let contract = contract.add0x.lowercased()

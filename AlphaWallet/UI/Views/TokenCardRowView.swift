@@ -1,6 +1,7 @@
 // Copyright © 2018 Stormbird PTE. LTD.
 
 import UIKit
+import WebKit
 
 class TokenCardRowView: UIView {
 	let checkboxImageView = UIImageView(image: R.image.ticket_bundle_unchecked())
@@ -19,6 +20,9 @@ class TokenCardRowView: UIView {
 	private let teamsLabel = UILabel()
 	private var detailsRowStack: UIStackView?
     private let showCheckbox: Bool
+	private let nameWebView = WKWebView(frame: .zero, configuration: .init())
+	private let introductionWebView = WKWebView(frame: .zero, configuration: .init())
+	private let instructionsWebView = WKWebView(frame: .zero, configuration: .init())
 	private var canDetailsBeVisible = true
     var areDetailsVisible = false {
 		didSet {
@@ -76,6 +80,9 @@ class TokenCardRowView: UIView {
             spaceAboveBottomRowStack,
 			bottomRowStack,
 			detailsRowStack!,
+			nameWebView,
+			introductionWebView,
+			instructionsWebView,
 		].asStackView(axis: .vertical, contentHuggingPriority: .required)
 		stackView.translatesAutoresizingMaskIntoConstraints = false
 		stackView.alignment = .leading
@@ -110,6 +117,13 @@ class TokenCardRowView: UIView {
 			background.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -xMargin),
 			background.topAnchor.constraint(equalTo: topAnchor, constant: yMargin),
 			background.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -yMargin),
+
+            nameWebView.heightAnchor.constraint(equalToConstant: 30),
+			introductionWebView.heightAnchor.constraint(equalToConstant: 200),
+			instructionsWebView.heightAnchor.constraint(equalToConstant: 200),
+			nameWebView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
+			introductionWebView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
+			instructionsWebView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
 
 			stateLabel.heightAnchor.constraint(equalToConstant: 22),
 		] + checkboxRelatedConstraints)
@@ -226,6 +240,9 @@ class TokenCardRowView: UIView {
 				strongSelf.venueLabel.text = streetStateCountry
 			}
 		}
+		nameWebView.loadHTMLString(tbmlNameHtmlString, baseURL: nil)
+		introductionWebView.loadHTMLString(tbmlIntroductionHtmlString, baseURL: nil)
+		instructionsWebView.loadHTMLString(tbmlInstructionHtmlString, baseURL: nil)
 
 		adjustmentsToHandleWhenCategoryLabelTextIsTooLong()
 	}
@@ -233,6 +250,51 @@ class TokenCardRowView: UIView {
 	private func adjustmentsToHandleWhenCategoryLabelTextIsTooLong() {
 		tokenCountLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 		categoryLabel.adjustsFontSizeToFitWidth = true
+	}
+}
+
+//hhh should move this
+extension TokenCardRowView {
+	var tbmlNameHtmlString: String {
+		let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
+//		return xmlHandler.nameHtmlString
+		let html = """
+				   <html>
+				   <head>
+				   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+				   </head>
+				   \(xmlHandler.nameHtmlString)
+				   </html>
+				   """
+		return html
+	}
+
+	var tbmlIntroductionHtmlString: String {
+		let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
+//		return xmlHandler.introductionHtmlString
+		let html = """
+				   <html>
+				   <head>
+				   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+				   </head>
+				   \(xmlHandler.introductionHtmlString)
+				   </html>
+				   """
+		return html
+	}
+
+	var tbmlInstructionHtmlString: String {
+        let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
+//		return xmlHandler.instructionsHtmlString
+		let html = """
+				   <html>
+				   <head>
+				   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+				   </head>
+				   \(xmlHandler.instructionsHtmlString)
+				   </html>
+				   """
+		return html
 	}
 }
 
