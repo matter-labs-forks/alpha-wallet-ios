@@ -32,6 +32,9 @@ target 'AlphaWallet' do
   pod 'PromiseKit/Alamofire'
   pod "Macaw", :git => 'https://github.com/alpha-wallet/Macaw.git', :commit => 'c13e70e63dd1a2554b59e0aa75c12b93e2ee9dd8'
   pod 'Kanna', '~> 4.0.0'
+  #hhh format
+  pod 'BRCybertron', :git => '/Users/hboon/Documents/workspace/projects/alphawallet/BRCybertron', :commit =>
+  '842820d57fa01e927946beaefcc01d6eb4effe88'
   pod 'AWSSNS'
   # pod 'AWSCognito'
   target 'AlphaWalletTests' do

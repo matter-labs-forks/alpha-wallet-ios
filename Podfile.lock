@@ -10,6 +10,11 @@ PODS:
     - AWSCore (= 2.6.28)
   - BigInt (3.0.1):
     - SipHash (~> 1.2)
+  - BRCybertron (1.1.0):
+    - BRCybertron/Core (= 1.1.0)
+  - BRCybertron/Core (1.1.0):
+    - BRCybertron/libxslt
+  - BRCybertron/libxslt (1.1.0)
   - CryptoSwift (0.10.0)
   - Eureka (4.3.0)
   - iOSSnapshotTestCase (3.0.0):
@@ -84,6 +89,7 @@ DEPENDENCIES:
   - APIKit
   - AWSSNS
   - BigInt (~> 3.0)
+  - BRCybertron (from `/Users/hboon/Documents/workspace/projects/alphawallet/BRCybertron`, commit `842820d57fa01e927946beaefcc01d6eb4effe88`)
   - CryptoSwift
   - Eureka (~> 4.3)
   - iOSSnapshotTestCase
@@ -148,6 +154,9 @@ EXTERNAL SOURCES:
   AlphaWalletWeb3Provider:
     :commit: f25206c50009d1eb922c3cc8c0ba91594155e8b6
     :git: https://github.com/AlphaWallet/AlphaWallet-web3-provider
+  BRCybertron:
+    :commit: 842820d57fa01e927946beaefcc01d6eb4effe88
+    :git: "/Users/hboon/Documents/workspace/projects/alphawallet/BRCybertron"
   Macaw:
     :commit: c13e70e63dd1a2554b59e0aa75c12b93e2ee9dd8
     :git: https://github.com/alpha-wallet/Macaw.git
@@ -170,6 +179,9 @@ CHECKOUT OPTIONS:
   AlphaWalletWeb3Provider:
     :commit: f25206c50009d1eb922c3cc8c0ba91594155e8b6
     :git: https://github.com/AlphaWallet/AlphaWallet-web3-provider
+  BRCybertron:
+    :commit: 842820d57fa01e927946beaefcc01d6eb4effe88
+    :git: "/Users/hboon/Documents/workspace/projects/alphawallet/BRCybertron"
   Macaw:
     :commit: c13e70e63dd1a2554b59e0aa75c12b93e2ee9dd8
     :git: https://github.com/alpha-wallet/Macaw.git
@@ -197,6 +209,7 @@ SPEC CHECKSUMS:
   AWSCore: f75fcf5b2f4325da49ae1f7cb5484778d3b0acc6
   AWSSNS: a67710a80c8d380e34248b16e503e0719f02a28d
   BigInt: 8e8a52161c745cd3ab78e3dc346a9fbee51e6cf6
+  BRCybertron: f4b26bdd39fca37f553236df873fb446c737a20a
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
   Eureka: 6d711cb30ca333b4bc893110285a722ae3840114
   iOSSnapshotTestCase: 23984ffe05289728d646cbb6a7a10b4fb1c93440
@@ -229,6 +242,6 @@ SPEC CHECKSUMS:
   TrustKeystore: 26efa8079f6451d02ce64b906d3ff240fd71d7ca
   web3swift: ec721fe509a4b3ca7abdf027d186d07fce65be8f
 
-PODFILE CHECKSUM: 60bd42079815449bfc0a86db9f656b1f7ec2e1cb
+PODFILE CHECKSUM: 72efd75760e1ef99036c969c56348d8777850fec
 
 COCOAPODS: 1.5.3

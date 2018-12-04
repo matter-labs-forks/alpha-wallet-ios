@@ -3336,6 +3336,7 @@
 				"${BUILT_PRODUCTS_DIR}/AWSSNS/AWSSNS.framework",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Alamofire-Synchronous/Alamofire_Synchronous.framework",
+				"${BUILT_PRODUCTS_DIR}/BRCybertron/BRCybertron.framework",
 				"${BUILT_PRODUCTS_DIR}/BigInt/BigInt.framework",
 				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
@@ -3373,6 +3374,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSSNS.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire_Synchronous.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BRCybertron.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BigInt.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
@@ -4270,6 +4272,16 @@
 				CURRENT_PROJECT_VERSION = 157;
 				DEVELOPMENT_TEAM = LRAW5PL536;
 				ENABLE_BITCODE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"${PODS_ROOT}/Headers/Private/BRCybertron/BRCybertron/libxslt\"",
+					"\"${PODS_ROOT}/Headers/Private/BRCybertron/libxslt\"",
+					"$(SDKROOT)/usr/include/libxml2",
+					"\"$(PODS_ROOT)/libsodium/src/libsodium/include/sodium\"",
+					"\"$(PODS_ROOT)/libsodium/src/libsodium/include\"",
+				);
 				INFOPLIST_FILE = AlphaWallet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -D DEBUG";
@@ -4296,6 +4308,16 @@
 				CURRENT_PROJECT_VERSION = 157;
 				DEVELOPMENT_TEAM = LRAW5PL536;
 				ENABLE_BITCODE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"${PODS_ROOT}/Headers/Private/BRCybertron/BRCybertron/libxslt\"",
+					"\"${PODS_ROOT}/Headers/Private/BRCybertron/libxslt\"",
+					"$(SDKROOT)/usr/include/libxml2",
+					"\"$(PODS_ROOT)/libsodium/src/libsodium/include/sodium\"",
+					"\"$(PODS_ROOT)/libsodium/src/libsodium/include\"",
+				);
 				INFOPLIST_FILE = AlphaWallet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.stormbird.alphawallet;
