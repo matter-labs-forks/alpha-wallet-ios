@@ -1,7 +1,13 @@
 // Copyright © 2018 Stormbird PTE. LTD.
 
 import UIKit
+//hhh new
+import BigInt
+import PromiseKit
+import Result
+import TrustKeystore
 import WebKit
+import web3swift
 
 class TokenCardRowView: UIView {
 	let checkboxImageView = UIImageView(image: R.image.ticket_bundle_unchecked())
@@ -23,6 +29,7 @@ class TokenCardRowView: UIView {
 	private let nameWebView = WKWebView(frame: .zero, configuration: .init())
 	private let introductionWebView = WKWebView(frame: .zero, configuration: .init())
 	private let instructionsWebView = WKWebView(frame: .zero, configuration: .init())
+	private let iframeActionButton0 = UIButton(type: .system)
 	private var canDetailsBeVisible = true
     var areDetailsVisible = false {
 		didSet {
@@ -83,6 +90,7 @@ class TokenCardRowView: UIView {
 			nameWebView,
 			introductionWebView,
 			instructionsWebView,
+			iframeActionButton0,
 		].asStackView(axis: .vertical, contentHuggingPriority: .required)
 		stackView.translatesAutoresizingMaskIntoConstraints = false
 		stackView.alignment = .leading
@@ -125,6 +133,8 @@ class TokenCardRowView: UIView {
 			introductionWebView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
 			instructionsWebView.widthAnchor.constraint(equalTo: stackView.widthAnchor),
 
+			iframeActionButton0.widthAnchor.constraint(equalTo: stackView.widthAnchor),
+
 			stateLabel.heightAnchor.constraint(equalToConstant: 22),
 		] + checkboxRelatedConstraints)
 	}
@@ -135,7 +145,7 @@ class TokenCardRowView: UIView {
 
 	func configure(viewModel: TokenCardRowViewModelProtocol) {
 		background.backgroundColor = viewModel.contentsBackgroundColor
-		background.layer.cornerRadius = 20
+		background.layer.cornerRadius = 10
 		background.layer.shadowRadius = 3
 		background.layer.shadowColor = UIColor.black.cgColor
 		background.layer.shadowOffset = CGSize(width: 0, height: 0)
@@ -240,9 +250,35 @@ class TokenCardRowView: UIView {
 				strongSelf.venueLabel.text = streetStateCountry
 			}
 		}
+		nameWebView.scrollView.isScrollEnabled = false
+		introductionWebView.scrollView.isScrollEnabled = false
+		instructionsWebView.scrollView.isScrollEnabled = false
+
+		//hhh block navigation. Still good to have even if we end up using XSLT?
+		nameWebView.navigationDelegate = self
+		introductionWebView.navigationDelegate = self
+		instructionsWebView.navigationDelegate = self
+
 		nameWebView.loadHTMLString(tbmlNameHtmlString, baseURL: nil)
 		introductionWebView.loadHTMLString(tbmlIntroductionHtmlString, baseURL: nil)
 		instructionsWebView.loadHTMLString(tbmlInstructionHtmlString, baseURL: nil)
+
+		iframeActionButton0.setTitleColor(viewModel.buttonTitleColor, for: .normal)
+		iframeActionButton0.setTitleColor(viewModel.disabledButtonTitleColor, for: .disabled)
+		iframeActionButton0.backgroundColor = viewModel.buttonBackgroundColor
+		iframeActionButton0.titleLabel?.font = viewModel.buttonFont
+		iframeActionButton0.cornerRadius = 12
+
+		//hhh can have 0 or more actions, not just 1
+		let actions = tbmlActions
+		if actions.isEmpty {
+			iframeActionButton0.isHidden = true
+		} else {
+			iframeActionButton0.isHidden = false
+			let (actionName, _) = actions[0]
+			iframeActionButton0.setTitle(actionName, for: .normal)
+			iframeActionButton0.addTarget(self, action: #selector(iframeAction0), for: .touchUpInside)
+		}
 
 		adjustmentsToHandleWhenCategoryLabelTextIsTooLong()
 	}
@@ -250,6 +286,89 @@ class TokenCardRowView: UIView {
 	private func adjustmentsToHandleWhenCategoryLabelTextIsTooLong() {
 		tokenCountLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 		categoryLabel.adjustsFontSizeToFitWidth = true
+	}
+
+	@objc func iframeAction0() {
+        //hhh 0 or more actions
+        let actions = tbmlActions
+		guard !actions.isEmpty else { return }
+		//hhh implement action. Call smart contract?
+        NSLog("xxx tapped Open Door action")
+		let (actionName, functionCall) = actions[0]
+
+		//hhh pass in server, contract, function name, input/output specs, argument (token ID)
+        //hhh remove
+//		let functionCall = AssetAttributeFunctionCall(server: Config().server, contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c", functionName: "name", inputs: [], output: .init(type: .string), arguments: [])
+		//hhh tokenId not used. Already part of functionCall
+        let tokenId: BigUInt = 0
+
+        //hhh no caching, right? But should we throttle, in case user taps many times?
+		let promise = makeRpcPromise(tokenId: tokenId, functionCall: functionCall)
+		promise.done { [weak self] result in
+			guard let strongSelf = self else { return }
+            //hhh show result
+			NSLog("xxx called function and result: \(result)")
+		}.catch { [weak self] _ in
+			guard let strongSelf = self else { return }
+            //hhh show failure
+            NSLog("xxx error calling open door function")
+		}
+	}
+
+	//hhh very much like CallForAssetAttributeCoordinator
+	private func makeRpcPromise(
+			tokenId: BigUInt,
+			functionCall: AssetAttributeFunctionCall) -> Promise<AssetAttributeValue> {
+		return Promise<AssetAttributeValue> { seal in
+			guard let contractAddress = EthereumAddress(functionCall.contract) else {
+				seal.reject(Web3Error(description: "Error converting contract address: \(functionCall.contract)"))
+				return
+			}
+
+            //hhh get config
+			let config = Config()
+			guard let webProvider = Web3HttpProvider(config.rpcURL, network: config.server.web3Network) else {
+				seal.reject(AnyError(Web3Error(description: "Error creating web provider for: \(config.rpcURL) + \(config.server.web3Network)")))
+				return
+			}
+
+			guard let function = CallForAssetAttribute(functionName: functionCall.functionName, inputs: functionCall.inputs, output: functionCall.output) else {
+				seal.reject(AnyError(Web3Error(description: "Failed to create CallForAssetAttribute instance for function: \(functionCall.functionName)")))
+				return
+			}
+
+			let web3 = web3swift.web3(provider: webProvider)
+			guard let contractInstance = web3swift.web3.web3contract(web3: web3, abiString: "[\(function.abi)]", at: contractAddress, options: web3.options) else {
+				seal.reject(AnyError(Web3Error(description: "Error creating web3swift contract instance to call \(function.name)()")))
+				return
+			}
+
+			guard let promise = contractInstance.method(function.name, parameters: functionCall.arguments, options: nil) else {
+				seal.reject(AnyError(Web3Error(description: "Error calling \(function.name)() on contract: \(functionCall.contract)")))
+				return
+			}
+
+			//Fine to store a strong reference to self here because it's still useful to cache the function call result
+			promise.callPromise(options: nil).done { dictionary in
+				if let value = dictionary["0"] {
+					switch functionCall.output.type {
+					case .bool:
+						let result = value as? Bool ?? false
+						seal.fulfill(result)
+					case .string:
+						let result = value as? String ?? ""
+						seal.fulfill(result)
+					case .int, .int8, .int16, .int32, .int64, .int128, .int256, .uint, .uint8, .uint16, .uint32, .uint64, .uint128, .uint256:
+						let result = value as? Int ?? 0
+						seal.fulfill(result)
+					}
+				} else {
+					seal.reject(Web3Error(description: "nil result from calling: \(function.name)() on contract: \(functionCall.contract)"))
+				}
+			}.catch { error in
+				seal.reject(AnyError(error))
+			}
+		}
 	}
 }
 
@@ -296,10 +415,28 @@ extension TokenCardRowView {
 				   """
 		return html
 	}
+
+	//hhh wrong type
+	var tbmlActions: [(String, AssetAttributeFunctionCall)] {
+		let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
+        return xmlHandler.iframeFunctionCalls
+	}
 }
 
 extension TokenCardRowView: TokenRowView {
 	func configure(tokenHolder: TokenHolder) {
 		configure(viewModel: TokenCardRowViewModel(tokenHolder: tokenHolder))
+	}
+}
+
+extension TokenCardRowView: WKNavigationDelegate {
+	public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if let url = navigationAction.request.url?.absoluteString, url == "about:blank" {
+			NSLog("xxx allow url: \(navigationAction.request.url?.absoluteString)")
+			decisionHandler(.allow)
+		} else {
+			NSLog("xxx block url: \(navigationAction.request.url?.absoluteString)")
+			decisionHandler(.cancel)
+		}
 	}
 }

@@ -100,7 +100,8 @@ enum AssetAttribute {
         }()
     }
 
-    private static func extractInputs(fromInputsElement inputsElement: XMLElement) -> [CallForAssetAttribute.Argument] {
+    //hhh have to make public?
+    public static func extractInputs(fromInputsElement inputsElement: XMLElement) -> [CallForAssetAttribute.Argument] {
         return XMLHandler.getInputs(fromInputsElement: inputsElement).compactMap {
             if let inputTypeString = $0.tagName, !inputTypeString.isEmpty, let inputName = $0["ref"], !inputName.isEmpty, let inputType = CallForAssetAttribute.SolidityType(rawValue: inputTypeString) {
                 return .init(name: inputName, type: inputType)

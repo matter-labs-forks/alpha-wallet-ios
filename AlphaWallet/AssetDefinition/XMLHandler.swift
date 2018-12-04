@@ -75,6 +75,56 @@ private class PrivateXMLHandler {
         }
     }
 
+    //hhh wrong type
+    var iframeFunctionCalls: [(String, AssetAttributeFunctionCall)] {
+        var results = [(String, AssetAttributeFunctionCall)]()
+        //hhh move to bottom where we keep all the xpath expressions together
+        //hhh so there might be functions where we call a delegate contract
+        //hhh remove XMLElement type spec
+        for each: XMLElement in xml.xpath("/token/features/action[@contract='holding-contract']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces) {
+            let lang = getLang()
+            //hhh fallback for name[@lang]
+            //hhh support 0 or more action
+            if let functionElement = each.at_xpath("function".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces),
+               let functionName = functionElement["name"],
+               !functionName.isEmpty,
+               let nameElement = each.at_xpath("name[@xml:lang='\(lang)']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces),
+               let name = nameElement.text, !name.isEmpty {
+                let inputs: [CallForAssetAttribute.Argument]
+                //hhh return type ignore?
+//                let returnType = syntax.solidityReturnType
+                //hhh output ignore?
+//                let output = CallForAssetAttribute.ReturnType(type: returnType)
+                if let inputsElement = XMLHandler.getInputsElement(fromFunctionElement: functionElement, namespacePrefix: rootNamespacePrefix, namespaces: namespaces) {
+                    inputs = AssetAttribute.extractInputs(fromInputsElement: inputsElement)
+                } else {
+                    inputs = []
+                }
+                let arguments: [AnyObject]
+                if inputs.isEmpty {
+                    arguments = []
+                } else {
+                    //hhh should also check for input ref = "tokenID"
+                    //hhh read from somewhere?
+                    let tokenId: BigUInt = 1
+                    arguments = [String(tokenId) as NSString]
+                }
+                //hhh has arg here, so can't construct here, have to construct when we want to call? So Still need a way to describe the function call name, input, output without args. Something like AssetAttribute, but have to extract something out of it to reuse?
+                let functionCall = AssetAttributeFunctionCall(
+                        server: Config().server,
+                        contract: contractAddress,
+                        functionName: functionName,
+                        inputs: inputs,
+                        //hhh so output needs to support void also
+                        output: .init(type: .string),
+                        arguments: arguments
+                )
+                results.append((name, functionCall))
+            }
+        }
+        return results
+    }
+
     init(contract: String, assetDefinitionStore store: AssetDefinitionStore?) {
         contractAddress = contract.add0x.lowercased()
         let assetDefinitionStore = store ?? AssetDefinitionStore()
@@ -220,6 +270,10 @@ public class XMLHandler {
         return privateXMLHandler.instructionsHtmlString
     }
 
+    //hhh wrong type
+    var iframeFunctionCalls: [(String, AssetAttributeFunctionCall)] {
+        return privateXMLHandler.iframeFunctionCalls
+    }
 
     init(contract: String, assetDefinitionStore: AssetDefinitionStore? = nil) {
         let contract = contract.add0x.lowercased()
