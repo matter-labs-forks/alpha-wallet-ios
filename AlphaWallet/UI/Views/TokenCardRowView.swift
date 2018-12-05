@@ -254,7 +254,6 @@ class TokenCardRowView: UIView {
 		introductionWebView.scrollView.isScrollEnabled = false
 		instructionsWebView.scrollView.isScrollEnabled = false
 
-		//hhh block navigation. Still good to have even if we end up using XSLT?
 		nameWebView.navigationDelegate = self
 		introductionWebView.navigationDelegate = self
 		instructionsWebView.navigationDelegate = self
@@ -306,8 +305,12 @@ class TokenCardRowView: UIView {
 		let promise = makeRpcPromise(tokenId: tokenId, functionCall: functionCall)
 		promise.done { [weak self] result in
 			guard let strongSelf = self else { return }
-            //hhh show result
+			//hhh show result
 			NSLog("xxx called function and result: \(result)")
+			//hhh remove displaying RPC call results in alert
+			if let vc = UIApplication.shared.keyWindow?.topViewController {
+				UIAlertController.alert(title: "\(actionName) — Result of calling: \(functionCall.functionName)", message: "\(result)", alertButtonTitles: ["OK"], alertButtonStyles: [.default], viewController: vc, completion: nil)
+			}
 		}.catch { [weak self] _ in
 			guard let strongSelf = self else { return }
             //hhh show failure
@@ -376,50 +379,34 @@ class TokenCardRowView: UIView {
 extension TokenCardRowView {
 	var tbmlNameHtmlString: String {
 		let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
-//		return xmlHandler.nameHtmlString
-		let html = """
-				   <html>
-				   <head>
-				   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-				   </head>
-				   \(xmlHandler.nameHtmlString)
-				   </html>
-				   """
-		return html
+		return wrapWithHtmlViewport(xmlHandler.nameHtmlString)
 	}
 
 	var tbmlIntroductionHtmlString: String {
 		let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
-//		return xmlHandler.introductionHtmlString
-		let html = """
-				   <html>
-				   <head>
-				   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-				   </head>
-				   \(xmlHandler.introductionHtmlString)
-				   </html>
-				   """
-		return html
+		return wrapWithHtmlViewport(xmlHandler.introductionHtmlString)
 	}
 
 	var tbmlInstructionHtmlString: String {
         let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
-//		return xmlHandler.instructionsHtmlString
-		let html = """
-				   <html>
-				   <head>
-				   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-				   </head>
-				   \(xmlHandler.instructionsHtmlString)
-				   </html>
-				   """
-		return html
+		return wrapWithHtmlViewport(xmlHandler.instructionsHtmlString)
 	}
 
 	//hhh wrong type
 	var tbmlActions: [(String, AssetAttributeFunctionCall)] {
 		let xmlHandler = XMLHandler(contract: "0xd2a0ddf0f4d7876303a784cfadd8f95ec1fb791c")
         return xmlHandler.iframeFunctionCalls
+	}
+
+	private func wrapWithHtmlViewport(_ html: String) -> String {
+		return """
+               <html>
+               <head>
+               <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+               </head>
+               \(html)
+               </html>
+               """
 	}
 }
 
@@ -429,6 +416,8 @@ extension TokenCardRowView: TokenRowView {
 	}
 }
 
+//hhh move to a standalone class. Clearer. Global instance somehow? Otherwise not retained
+//Block navigation. Still good to have even if we end up using XSLT?
 extension TokenCardRowView: WKNavigationDelegate {
 	public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url?.absoluteString, url == "about:blank" {
@@ -439,4 +428,23 @@ extension TokenCardRowView: WKNavigationDelegate {
 			decisionHandler(.cancel)
 		}
 	}
+}
+
+//hhh remove
+extension UIWindow {
+    fileprivate var topViewController: UIViewController? {
+        var top = self.rootViewController
+        while true {
+            if let presented = top?.presentedViewController {
+                top = presented
+            } else if let nav = top as? UINavigationController {
+                top = nav.visibleViewController
+            } else if let tab = top as? UITabBarController {
+                top = tab.selectedViewController
+            } else {
+                break
+            }
+        }
+        return top
+    }
 }

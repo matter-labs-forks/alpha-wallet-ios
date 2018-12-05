@@ -10,6 +10,7 @@ import Foundation
 import BigInt
 import Kanna
 import TrustKeystore
+import BRCybertron
 
 enum SingularOrPlural {
     case singular
@@ -47,7 +48,12 @@ private class PrivateXMLHandler {
         //hhh move to bottom where we keep all the xpath expressions together
         //hhh fallback to first if not found
         if let nameElement = xml.at_xpath("/token/appearance/name[@lang='\(lang)']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces) {
-            return nameElement.innerHTML ?? ""
+            let html = nameElement.innerHTML ?? ""
+            NSLog("xxx before sanitize: \(html)")
+            //hhh remove
+            let result = sanitize(html: html)
+            NSLog("xxx after sanitize: \(result)")
+            return result
         } else {
             return ""
         }
@@ -58,7 +64,8 @@ private class PrivateXMLHandler {
         //hhh move to bottom where we keep all the xpath expressions together
         //hhh fallback to first if not found
         if let introductionElement = xml.at_xpath("/token/appearance/introduction[@lang='\(lang)']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces) {
-            return introductionElement.innerHTML ?? ""
+            let html = introductionElement.innerHTML ?? ""
+            return sanitize(html: html)
         } else {
             return ""
         }
@@ -69,11 +76,43 @@ private class PrivateXMLHandler {
         //hhh move to bottom where we keep all the xpath expressions together
         //hhh fallback to first if not found
         if let instructionElement = xml.at_xpath("/token/appearance/instruction[@lang='\(lang)']".addToXPath(namespacePrefix: rootNamespacePrefix), namespaces: namespaces) {
-            return instructionElement.innerHTML ?? ""
+            let html = instructionElement.innerHTML ?? ""
+            return sanitize(html: html)
         } else {
             return ""
         }
     }
+
+    private lazy var xsltToSanitizeHtml: Data? = {
+        //Stripping <html> also strips the <html> we had to wrap the content with when we sanitize
+        //hhh can remove indent?
+        return """
+                <xsl:stylesheet version="1.0"
+                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                      <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
+                      <xsl:template match="node()|@*">
+                      <xsl:copy>
+                        <xsl:apply-templates select="node()|@*"/>
+                      </xsl:copy>
+                    </xsl:template>
+
+                    <xsl:template match="*[name() = 'iframe']">
+                    </xsl:template>
+                    <xsl:template match="*[name() = 'script']">
+                    </xsl:template>
+
+                    <xsl:template match="*[name() = 'a']">
+                        <xsl:apply-templates/>
+                    </xsl:template>
+                     <xsl:template match="*[name() = 'button']">
+                         <xsl:apply-templates/>
+                     </xsl:template>
+                     <xsl:template match="*[name() = 'html']">
+                         <xsl:apply-templates/>
+                     </xsl:template>
+                </xsl:stylesheet>
+              """.data(using: .utf8)
+    }()
 
     //hhh wrong type
     var iframeFunctionCalls: [(String, AssetAttributeFunctionCall)] {
@@ -245,6 +284,18 @@ private class PrivateXMLHandler {
         } else {
             return ""
         }
+    }
+
+    //hhh Need to cache? Too slow?
+    private func sanitize(html: String) -> String {
+        guard let xsltToSanitizeHtml = xsltToSanitizeHtml else { return "" }
+        //Wrapping with <html> (<body> should work too) is essential otherwise encoding of the output will be wrong
+        let wrappedHtml = "<html>\(html)</html>"
+        guard let xmlData = wrappedHtml.data(using: .utf8) else { return "" }
+        let xslt = CYTemplate(data: xsltToSanitizeHtml)
+        //We really want `CYParsingDefaultOptions` but the compiler doesn't let us so we use `.init(rawValue: 0)`. Note that this is different from `[]`.
+        let source = CYDataInputSource(data: xmlData, options: .init(rawValue: 0))
+        return xslt.transform(toString: source, parameters: [:], error: nil)
     }
 }
 
