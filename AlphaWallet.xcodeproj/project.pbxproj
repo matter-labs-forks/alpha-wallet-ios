@@ -556,6 +556,8 @@
 		9196A73E21BBA00100852ED0 /* UTXOCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9196A73A21BBA00000852ED0 /* UTXOCell.xib */; };
 		9196A73F21BBA00100852ED0 /* UTXOsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9196A73B21BBA00000852ED0 /* UTXOsViewController.xib */; };
 		9196A74321BBA2FD00852ED0 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A74221BBA2FD00852ED0 /* Alerts.swift */; };
+		9196A74621BC165900852ED0 /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A74521BC165900852ED0 /* AccountService.swift */; };
+		9196A74921BC16E200852ED0 /* PlasmaTransactionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A74821BC16E200852ED0 /* PlasmaTransactionsService.swift */; };
 		AA26C61F20412A1E00318B9B /* TokensCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA26C61D20412A1D00318B9B /* TokensCardViewController.swift */; };
 		AA26C62320412A4100318B9B /* UIViewInspectableEnhancements.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA26C62120412A4100318B9B /* UIViewInspectableEnhancements.swift */; };
 		AA26C62420412A4100318B9B /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA26C62220412A4100318B9B /* Double.swift */; };
@@ -1168,6 +1170,8 @@
 		9196A73A21BBA00000852ED0 /* UTXOCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UTXOCell.xib; sourceTree = "<group>"; };
 		9196A73B21BBA00000852ED0 /* UTXOsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UTXOsViewController.xib; sourceTree = "<group>"; };
 		9196A74221BBA2FD00852ED0 /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
+		9196A74521BC165900852ED0 /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
+		9196A74821BC16E200852ED0 /* PlasmaTransactionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlasmaTransactionsService.swift; sourceTree = "<group>"; };
 		AA26C61D20412A1D00318B9B /* TokensCardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokensCardViewController.swift; sourceTree = "<group>"; };
 		AA26C62120412A4100318B9B /* UIViewInspectableEnhancements.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewInspectableEnhancements.swift; sourceTree = "<group>"; };
 		AA26C62220412A4100318B9B /* Double.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
@@ -3140,6 +3144,7 @@
 		9196A72821BB74DE00852ED0 /* MatterPlasmaPresentation */ = {
 			isa = PBXGroup;
 			children = (
+				9196A74421BC160300852ED0 /* Services */,
 				9196A73721BB9FAF00852ED0 /* Views */,
 				9196A73421BB9DA000852ED0 /* Models */,
 				9196A72C21BB79EC00852ED0 /* ViewControllers */,
@@ -3173,6 +3178,15 @@
 				9196A74221BBA2FD00852ED0 /* Alerts.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		9196A74421BC160300852ED0 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9196A74521BC165900852ED0 /* AccountService.swift */,
+				9196A74821BC16E200852ED0 /* PlasmaTransactionsService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		AA574E612054EC8B00F4B3AF /* Rest */ = {
@@ -3918,6 +3932,7 @@
 				442FCE0DAE5527A93F54022C /* RedeemTokenCardQuantitySelectionViewController.swift in Sources */,
 				442FC0B59B23C0F3068621C0 /* NumberStepper.swift in Sources */,
 				442FCE2BEE8D475C7DEB39C1 /* RedeemTokenCardQuantitySelectionViewModel.swift in Sources */,
+				9196A74921BC16E200852ED0 /* PlasmaTransactionsService.swift in Sources */,
 				442FCB9CF5BC243F0705F4FE /* TokenCardRedemptionViewController.swift in Sources */,
 				442FC546ED56F5C9D3D35471 /* TokenCardRedemptionViewModel.swift in Sources */,
 				5E7C75F80A7E178B49830BCD /* TokenCardsViewControllerHeader.swift in Sources */,
@@ -4087,6 +4102,7 @@
 				5E7C7E2E47ED7EDD5C127D1D /* HistoryStore.swift in Sources */,
 				5E7C7E7C719E9B11A402D059 /* BookmarksViewModel.swift in Sources */,
 				5E7C709168AFA09B5D2926FB /* BookmarkViewModel.swift in Sources */,
+				9196A74621BC165900852ED0 /* AccountService.swift in Sources */,
 				5E7C7FC76A025AD91D57B960 /* HistoriesViewModel.swift in Sources */,
 				5E7C73FDC874F983EC83B820 /* HistoryViewModel.swift in Sources */,
 				5E7C7A6C28C59DB62DEE2D63 /* BookmarkViewCell.swift in Sources */,

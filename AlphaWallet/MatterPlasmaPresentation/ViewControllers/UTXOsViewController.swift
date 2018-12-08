@@ -14,6 +14,7 @@ class UTXOsViewController: UIViewController {
     @IBOutlet weak var walletTableView: UITableView!
     
     private let alerts = Alerts()
+    private let plasmaTxService = PlasmaTransactionsService()
     
     private var session: WalletSession?
     private var keystore: Keystore?
@@ -101,79 +102,48 @@ class UTXOsViewController: UIViewController {
         UTXOsArray[indexPathTapped.row].isSelected = !selected
         cell.changeSelectButton(isSelected: !selected)
         if chosenUTXOs.count == 2 {
-            alerts.showAccessAlert(for: self, with: "Merge UTXOs?") { [weak self] (result) in
-                if result {
-                    self?.formMergeUTXOsTransaction(forWallet: utxo.inWallet)
-                }
-            }
+            mergeTx()
         }
     }
     
-    func formMergeUTXOsTransaction(forWallet: Wallet) {
-        var inputs = [PlasmaTransactionInput]()
-        var mergedAmount: BigUInt = 0
-        do {
-            for utxo in chosenUTXOs {
-                let input = try? utxo.utxo.toTransactionInput()
-                if let i = input {
-                    inputs.append(i)
-                    mergedAmount += i.amount
+    private func mergeTx() {
+        guard let session = self.session else {
+            alerts.showErrorAlert(for: self, error: PlasmaErrors.NetErrors.noData, completion: {})
+            return
+        }
+        guard let wallet = self.wallet else {
+            alerts.showErrorAlert(for: self, error: PlasmaErrors.NetErrors.noData, completion: {})
+            return
+        }
+        alerts.showAccessAlert(for: self, with: "Merge UTXOs?") { [weak self] (result) in
+            if result {
+                guard let transaction = self?.plasmaTxService.formMergeUTXOsTransaction(chosenUTXOs: (self?.chosenUTXOs)!, wallet: wallet) else {
+                    self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.StructureErrors.wrongData, completion: {})
+                    return
+                }
+                let result = self?.plasmaTxService.signAndSend(transaction: transaction, inSession: session)
+                switch result {
+                case true:
+                    self?.alerts.showSuccessAlert(for: self!, completion: {
+                        self?.updateTable()
+                    })
+                default:
+                    self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.NetErrors.badResponse, completion: {})
                 }
             }
-            guard let address = EthereumAddress(forWallet.address.description) else {return}
-            let output = try PlasmaTransactionOutput(outputNumberInTx: 0,
-                                                     receiverEthereumAddress: address,
-                                                     amount: mergedAmount)
-            let outputs = [output]
-            let transaction = try PlasmaTransaction(txType: .merge,
-                                                    inputs: inputs,
-                                                    outputs: outputs)
-            self.signAndSend(transaction: transaction)
-        } catch let error {
-            alerts.showErrorAlert(for: self, error: error, completion: {})
         }
-    }
-    
-    private func formSplitUTXOsTransaction(utxo: PlasmaUTXOs, address: String, amount: String) -> PlasmaTransaction? {
-        do {
-            let input = try utxo.toTransactionInput()
-            let inputs = [input]
-            let destinationAddress = address.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-            guard let floatAmount = Float(amount) else {
-                return nil
-            }
-            let uintAmount = BigUInt( floatAmount * 1000000 )
-            let amountSendInETH = uintAmount * BigUInt(1000000000000)
-            let amountStayInETH = input.amount - amountSendInETH
-            
-            guard let ethDestinationAddress = EthereumAddress(destinationAddress) else {
-                return nil
-            }
-            guard let wallet = self.wallet else {
-                return nil
-            }
-            guard let ethCurrentAddress = EthereumAddress(wallet.address.description) else {
-                return nil
-            }
-            
-            let output1 = try PlasmaTransactionOutput(outputNumberInTx: 0,
-                                                      receiverEthereumAddress: ethDestinationAddress,
-                                                      amount: amountSendInETH)
-            let output2 = try PlasmaTransactionOutput(outputNumberInTx: 1,
-                                                 receiverEthereumAddress: ethCurrentAddress,
-                                                 amount: amountStayInETH)
-            
-            let outputs = [output1, output2]
-            
-            let transaction = try PlasmaTransaction(txType: .split, inputs: inputs, outputs: outputs)
-            return transaction
-            
-        } catch {
-            return nil
-        }
+        
     }
     
     private func sendTx(utxo: PlasmaUTXOs) {
+        guard let session = self.session else {
+            alerts.showErrorAlert(for: self, error: PlasmaErrors.NetErrors.noData, completion: {})
+            return
+        }
+        guard let wallet = self.wallet else {
+            alerts.showErrorAlert(for: self, error: PlasmaErrors.NetErrors.noData, completion: {})
+            return
+        }
         alerts.sendTxDialog(for: self,
                             title: "Send transaction",
                             subtitle: nil,
@@ -181,57 +151,24 @@ class UTXOsViewController: UIViewController {
                             cancelTitle: "Cancel",
                             addressInputPlaceholder: "Enter address",
                             amountInputPlaceholder: "Enter amount") { [weak self] (address, amount) in
-                                if address != nil && amount != nil {
-                                    if let transaction = self?.formSplitUTXOsTransaction(utxo: utxo, address: address!, amount: amount!) {
-                                        self?.signAndSend(transaction: transaction)
-                                    } else {
-                                        self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.StructureErrors.wrongData, completion: {})
-                                    }
-                                } else {
-                                    self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.StructureErrors.wrongData, completion: {})
-                                }
-        }
-    }
-    
-    private func signAndSend(transaction: PlasmaTransaction) {
-        do {
-            guard let privKey = getPrivKey() else {
-                return
-            }
-            let signedTransaction = try transaction.sign(privateKey: privKey)
-            guard let chainID = self.session?.config.chainID else {return}
-            let mainnet = chainID == 1
-            let testnet = !mainnet && chainID == 4
-            if !testnet && !mainnet {return}
-            let result = try PlasmaService().sendRawTX(transaction: signedTransaction, onTestnet: testnet)
-            switch result {
-            case true:
-                alerts.showSuccessAlert(for: self) { [weak self] in
-                    self?.updateTable()
+            if address != nil && amount != nil {
+                guard let transaction = self?.plasmaTxService.formSplitUTXOsTransaction(utxo: utxo, address: address!, amount: amount!, wallet: wallet) else {
+                    self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.StructureErrors.wrongData, completion: {})
+                    return
                 }
-            default:
-                alerts.showErrorAlert(for: self, error: PlasmaErrors.NetErrors.badResponse, completion: {})
+                let result = self?.plasmaTxService.signAndSend(transaction: transaction, inSession: session)
+                switch result {
+                case true:
+                    self?.alerts.showSuccessAlert(for: self!, completion: {
+                        self?.updateTable()
+                    })
+                default:
+                    self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.NetErrors.badResponse, completion: {})
+                }
+            } else {
+                self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.StructureErrors.wrongData, completion: {})
             }
-        } catch let error {
-            alerts.showErrorAlert(for: self, error: error, completion: {})
         }
-        
-    }
-    
-    private func getPrivKey() -> Data? {
-//        guard let address = wallet?.address else {return nil}
-//        // TODO: - It's not secure
-//        guard let keys: EtherKeystore = self.keystore as? EtherKeystore else {return nil}
-//        guard let account = keys.getAccount(for: address) else {return nil}
-////        guard let password = keystore?.getPassword(for: account) else {return nil}
-//        let result = keys.exportPrivateKey(account: account)
-//        switch result {
-//        case .success(let privKey):
-//            return privKey
-//        default:
-//            return nil
-//        }
-        return Data(hex: "BDBA6C3D375A8454993C247E2A11D3E81C9A2CE9911FF05AC7FF0FCCBAC554B5")
     }
     
     @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
