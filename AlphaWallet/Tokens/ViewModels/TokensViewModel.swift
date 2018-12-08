@@ -37,6 +37,8 @@ class TokensViewModel {
             return tokens.filter { $0.type != .ether && $0.type != .erc20 }
         case .collectiblesOnly:
             return tokens.filter { $0.type == .erc721 && !$0.balance.isEmpty }
+        case .plasma:
+            return tokens.filter { $0.type == .erc721 && !$0.balance.isEmpty }
         case .keyword(let keyword):
             let lowercasedKeyword = keyword.trimmed.lowercased()
             if lowercasedKeyword.isEmpty {
@@ -61,7 +63,7 @@ class TokensViewModel {
 
     var shouldShowTable: Bool {
         switch filter {
-        case .all, .currencyOnly, .assetsOnly, .keyword:
+        case .all, .currencyOnly, .assetsOnly, .keyword, .plasma:
             return hasContent
         case .collectiblesOnly:
             return false
@@ -70,7 +72,7 @@ class TokensViewModel {
 
     var shouldShowCollectiblesCollectionView: Bool {
         switch filter {
-        case .all, .currencyOnly, .assetsOnly, .keyword:
+        case .all, .currencyOnly, .assetsOnly, .keyword, .plasma:
             return false
         case .collectiblesOnly:
             return hasContent

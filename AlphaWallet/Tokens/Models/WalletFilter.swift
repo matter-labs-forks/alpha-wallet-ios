@@ -7,6 +7,7 @@ enum WalletFilter {
 	case currencyOnly
 	case assetsOnly
 	case collectiblesOnly
+    case plasma
 	case keyword(String)
 }
 
@@ -20,6 +21,8 @@ func ==(lhs: WalletFilter, rhs: WalletFilter) -> Bool {
 		return true
 	case (.collectiblesOnly, .collectiblesOnly):
 		return true
+    case (.plasma, .plasma):
+        return true
 	case (.keyword(let keyword1), .keyword(let keyword2)):
 		return keyword1 == keyword2
 	default:

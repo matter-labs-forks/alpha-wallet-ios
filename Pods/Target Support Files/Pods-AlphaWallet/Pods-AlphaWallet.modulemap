@@ -1,0 +1,6 @@
+framework module Pods_AlphaWallet {
+  umbrella header "Pods-AlphaWallet-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension BlockHeader {
+extension PlasmaBlockHeader {
     /// Prinets elements of Block header
     public func printElements() {
         print("---------------------------")

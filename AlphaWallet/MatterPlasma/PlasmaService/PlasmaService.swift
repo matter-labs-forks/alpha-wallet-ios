@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import EthereumAddress
 import BigInt
 import PromiseKit
+import web3swift
 private typealias PromiseResult = PromiseKit.Result
 
 /// A service that provides in-Plasma operations
@@ -135,7 +135,7 @@ public final class PlasmaService {
         return returnPromise
     }
     
-    public func sendRawTXPromise(transaction: SignedTransaction,
+    public func sendRawTXPromise(transaction: SignedPlasmaTransaction,
                                  onTestnet: Bool = false) -> Promise<Bool> {
         let returnPromise = Promise<Bool> { (seal) in
             let transactionString = transaction.data.toHexString().addHexPrefix()
@@ -191,14 +191,14 @@ public final class PlasmaService {
     ///     - `NetErrors.badResponse` if response is not HTTPURLResponse type or statusCode is not 200.
     ///     - `NetErrors.noData` if there is no data in response its errored.
     ///     - `StructureErrors.cantDecodeData` if data in response can't be deserialized correctly.
-    public func sendRawTX(transaction: SignedTransaction,
+    public func sendRawTX(transaction: SignedPlasmaTransaction,
                           onTestnet: Bool = false) throws -> Bool {
         return try sendRawTXPromise(transaction: transaction, onTestnet: onTestnet).wait()
     }
 
     private func request(url: URL,
                          data: Data?,
-                         method: Method,
+                         method: RequestMethod,
                          contentType: ContentType) -> URLRequest? {
         var request = URLRequest(url: url)
         request.httpShouldHandleCookies = true
@@ -211,7 +211,7 @@ public final class PlasmaService {
 
 }
 
-public enum Method: String {
+public enum RequestMethod: String {
     case post = "POST"
     case get = "GET"
 }

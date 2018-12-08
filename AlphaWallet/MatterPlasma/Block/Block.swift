@@ -7,14 +7,13 @@
 //
 
 import Foundation
-import SwiftRLP
 import BigInt
-import Web3swift
+import web3swift
 
 /// Plasma Block in storage
-public class Block {
-    public var blockHeader: BlockHeader
-    public var signedTransactions: [SignedTransaction]
+public class PlasmaBlock {
+    public var blockHeader: PlasmaBlockHeader
+    public var signedTransactions: [SignedPlasmaTransaction]
     
     /// Merkle tree of transactions in this Block
     public var merkleTree: PaddabbleTree? {
@@ -42,7 +41,7 @@ public class Block {
     /// - Parameters:
     ///   - blockHeader: BlockHeader, first 137 bytes
     ///   - signedTransactions: RLP encoded array of SignedTransaction
-    public init(blockHeader: BlockHeader, signedTransactions: [SignedTransaction]) {
+    public init(blockHeader: PlasmaBlockHeader, signedTransactions: [SignedPlasmaTransaction]) {
         self.blockHeader = blockHeader
         self.signedTransactions = signedTransactions
     }
@@ -54,19 +53,19 @@ public class Block {
     public init(data: Data) throws {
         guard data.count > blockHeaderByteLength else {throw PlasmaErrors.StructureErrors.wrongDataCount}
         let headerData = Data(data[0 ..< blockHeaderByteLength])
-        guard let blockHeader = try? BlockHeader(data: headerData) else {throw PlasmaErrors.StructureErrors.wrongData}
+        guard let blockHeader = try? PlasmaBlockHeader(data: headerData) else {throw PlasmaErrors.StructureErrors.wrongData}
         self.blockHeader = blockHeader
 
         let signedTransactionsData = Data(data[Int(blockHeaderByteLength) ..< data.count])
-        guard let item = RLP.decode(signedTransactionsData) else {throw PlasmaErrors.StructureErrors.wrongData}
+        guard let item = PlasmaRLP.decode(signedTransactionsData) else {throw PlasmaErrors.StructureErrors.wrongData}
         guard item.isList else {throw PlasmaErrors.StructureErrors.isNotList}
-        var signedTransactions = [SignedTransaction]()
+        var signedTransactions = [SignedPlasmaTransaction]()
         signedTransactions.reserveCapacity(item.count!)
         print("signed tx count: \(item.count!)")
         for i in 0 ..< item.count! {
             guard let txData = item[i]!.data else {throw PlasmaErrors.StructureErrors.isNotData}
             
-            guard let tx = try? SignedTransaction(data: txData) else {throw PlasmaErrors.StructureErrors.wrongData}
+            guard let tx = try? SignedPlasmaTransaction(data: txData) else {throw PlasmaErrors.StructureErrors.wrongData}
             signedTransactions.append(tx)
         }
         self.signedTransactions = signedTransactions
@@ -89,7 +88,7 @@ public class Block {
         for tx in self.signedTransactions {
             txArray.append(tx.data)
         }
-        guard let txRLP = RLP.encode(txArray as [AnyObject]) else {throw PlasmaErrors.StructureErrors.cantEncodeData}
+        guard let txRLP = PlasmaRLP.encode(txArray as [AnyObject]) else {throw PlasmaErrors.StructureErrors.cantEncodeData}
         return headerData + txRLP
     }
     
@@ -100,7 +99,7 @@ public class Block {
     ///     - tx: signed transaction from parameters
     ///     - proof: Data indicator that signed transaction is in Block transactions set
     /// - Throws: `PlasmaErrors.StructureErrors.wrongData` if something in proving is wrong
-    public func getProof(for transaction: SignedTransaction) throws -> (tx: SignedTransaction, proof: Data) {
+    public func getProof(for transaction: SignedPlasmaTransaction) throws -> (tx: SignedPlasmaTransaction, proof: Data) {
         guard let tree = self.merkleTree else {throw PlasmaErrors.StructureErrors.wrongData}
         for (counter, tx) in self.signedTransactions.enumerated() {
             let serializedTx = tx.data
@@ -119,7 +118,7 @@ public class Block {
     ///     - tx: signed transaction from parameters
     ///     - proof: Data indicator that signed transaction is in Block transactions set
     /// - Throws: `PlasmaErrors.StructureErrors.wrongData` if something in proving is wrong
-    public func getProofForTransactionByNumber(txNumber: BigUInt) throws -> (tx: SignedTransaction, proof: Data) {
+    public func getProofForTransactionByNumber(txNumber: BigUInt) throws -> (tx: SignedPlasmaTransaction, proof: Data) {
         let num = Int(txNumber)
         guard let tree = self.merkleTree else {throw PlasmaErrors.StructureErrors.wrongData}
         guard num < self.signedTransactions.count else {throw PlasmaErrors.StructureErrors.wrongData}
@@ -129,8 +128,8 @@ public class Block {
     }
 }
 
-extension Block: Equatable {
-    public static func ==(lhs: Block, rhs: Block) -> Bool {
+extension PlasmaBlock: Equatable {
+    public static func ==(lhs: PlasmaBlock, rhs: PlasmaBlock) -> Bool {
         return lhs.blockHeader == rhs.blockHeader &&
             lhs.signedTransactions == rhs.signedTransactions
     }

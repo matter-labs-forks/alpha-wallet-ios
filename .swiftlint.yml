@@ -24,6 +24,7 @@ included:
   - AlphaWallet
   - AlphaWalletTests
 excluded:
+  - AlphaWallet/MatterPlasma
   - AlphaWallet/Vendors
   - AlphaWallet/R.generated.swift
 function_parameter_count:
@@ -41,7 +42,7 @@ file_length:
 type_body_length:
   warning: 300
   error: 500
- 
+
 
 superfluous_disable_command: warning
 reporter: "xcode"

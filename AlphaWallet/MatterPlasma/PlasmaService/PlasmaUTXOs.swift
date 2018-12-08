@@ -42,8 +42,8 @@ public final class PlasmaUTXOs {
     ///
     /// - Returns: TransactionInput that is used in building Plasma Transaction
     /// - Throws: `StructureErrors.wrongBitWidth` if bytes count in some parameter is wrong
-    public func toTransactionInput() throws -> TransactionInput {
-        return try TransactionInput(blockNumber: self.blockNumber, txNumberInBlock: self.transactionNumber, outputNumberInTx: self.outputNumber, amount: self.value)
+    public func toTransactionInput() throws -> PlasmaTransactionInput {
+        return try PlasmaTransactionInput(blockNumber: self.blockNumber, txNumberInBlock: self.transactionNumber, outputNumberInTx: self.outputNumber, amount: self.value)
     }
 }
 

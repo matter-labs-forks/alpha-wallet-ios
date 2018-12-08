@@ -7,11 +7,10 @@
 //
 
 import Foundation
-import SwiftRLP
 import BigInt
 
 /// The header of Block (first 137 bytes)
-public struct BlockHeader {
+public struct PlasmaBlockHeader {
     public var blockNumber: BigUInt!
     public var numberOfTxInBlock: BigUInt!
     public var parentHash: Data!
@@ -154,8 +153,8 @@ public struct BlockHeader {
     }
 }
 
-extension BlockHeader: Equatable {
-    public static func ==(lhs: BlockHeader, rhs: BlockHeader) -> Bool {
+extension PlasmaBlockHeader: Equatable {
+    public static func ==(lhs: PlasmaBlockHeader, rhs: PlasmaBlockHeader) -> Bool {
         return lhs.blockNumber == rhs.blockNumber &&
             lhs.numberOfTxInBlock == rhs.numberOfTxInBlock &&
             lhs.parentHash == rhs.parentHash &&
