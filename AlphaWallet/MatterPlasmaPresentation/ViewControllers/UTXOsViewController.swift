@@ -62,7 +62,7 @@ class UTXOsViewController: UIViewController {
         guard let balance = session?.balance?.amountShort else {
             return
         }
-        self.balanceLabel.text = "Balance: " + balance + " ETH"
+        self.balanceLabel.text = "Possible deposit: " + balance + " ETH"
     }
     
     private func initDatabase() {
