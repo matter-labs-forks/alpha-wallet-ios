@@ -199,6 +199,23 @@ class InCoordinator: Coordinator {
         } else {
             tabBarController.viewControllers = [transactionCoordinator.navigationController]
         }
+        
+        //Plasma
+        let utxoController = UTXOsViewController(session: session,
+                                                 keystore: keystore)
+        let nav = UINavigationController()
+        utxoController.title = "Plasma"
+        nav.viewControllers = [utxoController]
+        nav.tabBarItem = UITabBarItem(title: "Plasma",
+                                      image: UIImage(named: "ethereum-token"),
+                                      selectedImage: nil)
+        
+        if let viewControllers = tabBarController.viewControllers, !viewControllers.isEmpty {
+            tabBarController.viewControllers?.append(nav)
+        } else {
+            tabBarController.viewControllers = [nav]
+        }
+        //
 
         let browserCoordinator = BrowserCoordinator(session: session, keystore: keystore, sharedRealm: realm)
         browserCoordinator.delegate = self

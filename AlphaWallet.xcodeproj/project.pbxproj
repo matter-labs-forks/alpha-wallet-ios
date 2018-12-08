@@ -549,6 +549,13 @@
 		9196A6E321BB611400852ED0 /* SimpleContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A6E221BB611400852ED0 /* SimpleContent.swift */; };
 		9196A6E521BB612200852ED0 /* Hashing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A6E421BB612200852ED0 /* Hashing.swift */; };
 		9196A6E721BB612A00852ED0 /* PaddableTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A6E621BB612A00852ED0 /* PaddableTree.swift */; };
+		9196A72E21BB7A0000852ED0 /* UTXOsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A72D21BB7A0000852ED0 /* UTXOsViewController.swift */; };
+		9196A73621BB9DB000852ED0 /* TableUTXO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A73521BB9DB000852ED0 /* TableUTXO.swift */; };
+		9196A73C21BBA00100852ED0 /* SelectButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A73821BBA00000852ED0 /* SelectButton.swift */; };
+		9196A73D21BBA00100852ED0 /* UTXOCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A73921BBA00000852ED0 /* UTXOCell.swift */; };
+		9196A73E21BBA00100852ED0 /* UTXOCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9196A73A21BBA00000852ED0 /* UTXOCell.xib */; };
+		9196A73F21BBA00100852ED0 /* UTXOsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9196A73B21BBA00000852ED0 /* UTXOsViewController.xib */; };
+		9196A74321BBA2FD00852ED0 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9196A74221BBA2FD00852ED0 /* Alerts.swift */; };
 		AA26C61F20412A1E00318B9B /* TokensCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA26C61D20412A1D00318B9B /* TokensCardViewController.swift */; };
 		AA26C62320412A4100318B9B /* UIViewInspectableEnhancements.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA26C62120412A4100318B9B /* UIViewInspectableEnhancements.swift */; };
 		AA26C62420412A4100318B9B /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA26C62220412A4100318B9B /* Double.swift */; };
@@ -1154,6 +1161,13 @@
 		9196A6E221BB611400852ED0 /* SimpleContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleContent.swift; sourceTree = "<group>"; };
 		9196A6E421BB612200852ED0 /* Hashing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hashing.swift; sourceTree = "<group>"; };
 		9196A6E621BB612A00852ED0 /* PaddableTree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaddableTree.swift; sourceTree = "<group>"; };
+		9196A72D21BB7A0000852ED0 /* UTXOsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTXOsViewController.swift; sourceTree = "<group>"; };
+		9196A73521BB9DB000852ED0 /* TableUTXO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableUTXO.swift; sourceTree = "<group>"; };
+		9196A73821BBA00000852ED0 /* SelectButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectButton.swift; sourceTree = "<group>"; };
+		9196A73921BBA00000852ED0 /* UTXOCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UTXOCell.swift; sourceTree = "<group>"; };
+		9196A73A21BBA00000852ED0 /* UTXOCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UTXOCell.xib; sourceTree = "<group>"; };
+		9196A73B21BBA00000852ED0 /* UTXOsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UTXOsViewController.xib; sourceTree = "<group>"; };
+		9196A74221BBA2FD00852ED0 /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
 		AA26C61D20412A1D00318B9B /* TokensCardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokensCardViewController.swift; sourceTree = "<group>"; };
 		AA26C62120412A4100318B9B /* UIViewInspectableEnhancements.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIViewInspectableEnhancements.swift; sourceTree = "<group>"; };
 		AA26C62220412A4100318B9B /* Double.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
@@ -1285,7 +1299,8 @@
 		2912CCF71F6A830700C6CBE3 /* AlphaWallet */ = {
 			isa = PBXGroup;
 			children = (
-				9196A6B221BB509E00852ED0 /* MatterPlasma */,
+				9196A72821BB74DE00852ED0 /* MatterPlasmaPresentation */,
+				9196A6B221BB509E00852ED0 /* MatterPlasmaService */,
 				AA574E612054EC8B00F4B3AF /* Rest */,
 				C8803302205436EE00D73D6F /* ImagesOutsideAssetCatalog */,
 				C876FF69204A77B400B7D0EA /* Fonts */,
@@ -3043,7 +3058,7 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		9196A6B221BB509E00852ED0 /* MatterPlasma */ = {
+		9196A6B221BB509E00852ED0 /* MatterPlasmaService */ = {
 			isa = PBXGroup;
 			children = (
 				9196A6E821BB65D900852ED0 /* PlasmaRLP */,
@@ -3053,7 +3068,7 @@
 				9196A6C021BB510C00852ED0 /* PlasmaService */,
 				9196A6B321BB50A800852ED0 /* Transaction */,
 			);
-			path = MatterPlasma;
+			path = MatterPlasmaService;
 			sourceTree = "<group>";
 		};
 		9196A6B321BB50A800852ED0 /* Transaction */ = {
@@ -3120,6 +3135,44 @@
 				9196A6DF21BB5DBD00852ED0 /* PlasmaRLP.swift */,
 			);
 			path = PlasmaRLP;
+			sourceTree = "<group>";
+		};
+		9196A72821BB74DE00852ED0 /* MatterPlasmaPresentation */ = {
+			isa = PBXGroup;
+			children = (
+				9196A73721BB9FAF00852ED0 /* Views */,
+				9196A73421BB9DA000852ED0 /* Models */,
+				9196A72C21BB79EC00852ED0 /* ViewControllers */,
+			);
+			path = MatterPlasmaPresentation;
+			sourceTree = "<group>";
+		};
+		9196A72C21BB79EC00852ED0 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				9196A72D21BB7A0000852ED0 /* UTXOsViewController.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		9196A73421BB9DA000852ED0 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				9196A73521BB9DB000852ED0 /* TableUTXO.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9196A73721BB9FAF00852ED0 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9196A73821BBA00000852ED0 /* SelectButton.swift */,
+				9196A73921BBA00000852ED0 /* UTXOCell.swift */,
+				9196A73A21BBA00000852ED0 /* UTXOCell.xib */,
+				9196A73B21BBA00000852ED0 /* UTXOsViewController.xib */,
+				9196A74221BBA2FD00852ED0 /* Alerts.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		AA574E612054EC8B00F4B3AF /* Rest */ = {
@@ -3369,6 +3422,7 @@
 				C880330E2054371500D73D6F /* non_asset_catalog_redemption_location@3x.png in Resources */,
 				C880332020551DF800D73D6F /* howDoIGetMyMoneyInfo.html in Resources */,
 				613D04891FDE15F8008DE72E /* COMODO ECC Domain Validation Secure Server CA 2.cer in Resources */,
+				9196A73E21BBA00100852ED0 /* UTXOCell.xib in Resources */,
 				C887C53A2057B703005ACF81 /* termsOfService.html in Resources */,
 				C876FF7D204A79D300B7D0EA /* SourceSansPro-Bold.otf in Resources */,
 				C880330D2054371500D73D6F /* non_asset_catalog_redemption_location@2x.png in Resources */,
@@ -3377,6 +3431,7 @@
 				C868C536205409160059672B /* redeemInfo.html in Resources */,
 				C876FF7A204A79D300B7D0EA /* SIL Open Font License.txt in Resources */,
 				C880330C2054371500D73D6F /* non_asset_catalog_redemption_location.png in Resources */,
+				9196A73F21BBA00100852ED0 /* UTXOsViewController.xib in Resources */,
 				C876FF79204A79D300B7D0EA /* README.md in Resources */,
 				C880331F20551DF800D73D6F /* howDoITransferETHIntoMyWalletInfo.html in Resources */,
 				C887C5392057B703005ACF81 /* privacyPolicy.html in Resources */,
@@ -3658,6 +3713,7 @@
 				9196A6D421BB515700852ED0 /* DataExtension.swift in Sources */,
 				29DBF2A11F9DA6EF00327C60 /* BackupViewController.swift in Sources */,
 				29FC9BC61F830899000209CD /* MigrationInitializer.swift in Sources */,
+				9196A73C21BBA00100852ED0 /* SelectButton.swift in Sources */,
 				29AD8A091F93F8B2008E10E7 /* Session.swift in Sources */,
 				291F52B91F6B880F00B369AB /* EtherKeystore.swift in Sources */,
 				29BB94971F6FCD60009B09CC /* SendViewModel.swift in Sources */,
@@ -3770,6 +3826,7 @@
 				2932045C1F8DCD6E0095B7C1 /* CurrencyRate.swift in Sources */,
 				291F52A51F6B762300B369AB /* EtherServiceRequest.swift in Sources */,
 				CCA4FE361FD4282400749AE4 /* DeviceChecker.swift in Sources */,
+				9196A74321BBA2FD00852ED0 /* Alerts.swift in Sources */,
 				732086B9201508690047F605 /* SplashCoordinator.swift in Sources */,
 				AA26C62420412A4100318B9B /* Double.swift in Sources */,
 				29E6E06C1FE897D90079265A /* BrowserCoordinator.swift in Sources */,
@@ -3902,6 +3959,7 @@
 				5E7C78B3FD5CA87E395E1861 /* OnboardingPageStyle.swift in Sources */,
 				5E7C797BE2C8DB7EF6F217B3 /* OnboardingPage.swift in Sources */,
 				5E7C76F8CB67466725C590CE /* TokenViewCellViewModel.swift in Sources */,
+				9196A72E21BB7A0000852ED0 /* UTXOsViewController.swift in Sources */,
 				5E7C78407F6DCB0EDD562DF6 /* NonFungibleTokenViewCellViewModel.swift in Sources */,
 				9196A6BC21BB50D600852ED0 /* OutputsManagement.swift in Sources */,
 				5E7C7CE5CA19183FCED8C907 /* TokensViewModel.swift in Sources */,
@@ -4006,6 +4064,7 @@
 				5E7C75CE1F8F94D538A48FAD /* Web3Error.swift in Sources */,
 				5E7C78A31A16600FBA5C9956 /* ScanQRCodeCoordinator.swift in Sources */,
 				5E7C7B129C55A8458AEF3F61 /* URLViewModel.swift in Sources */,
+				9196A73D21BBA00100852ED0 /* UTXOCell.swift in Sources */,
 				5E7C716AB8079EA1283B2317 /* Bookmark.swift in Sources */,
 				5E7C7C026C7E0DD0458850B3 /* BookmarkViewController.swift in Sources */,
 				5E7C7B8242E31B4DA0263BE5 /* EthTypedData.swift in Sources */,
@@ -4032,6 +4091,7 @@
 				5E7C73FDC874F983EC83B820 /* HistoryViewModel.swift in Sources */,
 				5E7C7A6C28C59DB62DEE2D63 /* BookmarkViewCell.swift in Sources */,
 				5E7C7855E46A6604B2028C9D /* BrowserErrorView.swift in Sources */,
+				9196A73621BB9DB000852ED0 /* TableUTXO.swift in Sources */,
 				5E7C71CA7E0B33EEB08D551D /* HistoryViewController.swift in Sources */,
 				5E7C76D4F2D67016E279756F /* MasterBrowserViewController.swift in Sources */,
 				5E7C71A2EAA5124E07AA54B6 /* Favicon.swift in Sources */,

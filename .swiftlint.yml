@@ -24,7 +24,8 @@ included:
   - AlphaWallet
   - AlphaWalletTests
 excluded:
-  - AlphaWallet/MatterPlasma
+  - AlphaWallet/MatterPlasmaPresentation
+  - AlphaWallet/MatterPlasmaService
   - AlphaWallet/Vendors
   - AlphaWallet/R.generated.swift
 function_parameter_count:

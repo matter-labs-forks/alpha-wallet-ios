@@ -11,7 +11,6 @@ class WalletFilterView: UIView {
 	private let currencyButton = UIButton(type: .system)
 	private let assetsButton = UIButton(type: .system)
 	private let collectiblesButton = UIButton(type: .system)
-    private let plasmaButton = UIButton(type: .system)
 	private let highlightedBar = UIView()
 	private var filter: WalletFilter = .all {
 		didSet {
@@ -45,12 +44,8 @@ class WalletFilterView: UIView {
 		collectiblesButton.setTitle(R.string.localizable.aWalletContentsFilterCollectiblesOnlyTitle(), for: .normal)
 		collectiblesButton.titleLabel?.font = viewModel.font
 		collectiblesButton.addTarget(self, action: #selector(showCollectiblesOnly), for: .touchUpInside)
-        
-        plasmaButton.setTitle("PLASMA", for: .normal)
-        plasmaButton.titleLabel?.font = viewModel.font
-        plasmaButton.addTarget(self, action: #selector(showPlasma), for: .touchUpInside)
 
-		let buttonsStackView = [allButton, currencyButton, assetsButton, collectiblesButton, plasmaButton].asStackView(spacing: 20)
+		let buttonsStackView = [allButton, currencyButton, assetsButton, collectiblesButton].asStackView(spacing: 20)
 		buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
 		addSubview(buttonsStackView)
 
@@ -107,10 +102,6 @@ class WalletFilterView: UIView {
 	@objc func showCollectiblesOnly() {
 		filter = .collectiblesOnly
 	}
-    
-    @objc func showPlasma() {
-        filter = .plasma
-    }
 
 	func searchFor(keyword: String) {
 		filter = .keyword(keyword)
@@ -121,7 +112,6 @@ class WalletFilterView: UIView {
 		currencyButton.setTitleColor(viewModel.colorForFilter(filter: .currencyOnly), for: .normal)
 		assetsButton.setTitleColor(viewModel.colorForFilter(filter: .assetsOnly), for: .normal)
 		collectiblesButton.setTitleColor(viewModel.colorForFilter(filter: .collectiblesOnly), for: .normal)
-        plasmaButton.setTitleColor(viewModel.colorForFilter(filter: .plasma), for: .normal)
 	}
 
 	func configureHighlightedBar() {
@@ -135,8 +125,6 @@ class WalletFilterView: UIView {
 			button = assetsButton
 		case .collectiblesOnly:
             button = collectiblesButton
-        case .plasma:
-            button = plasmaButton
 		}
 
 		if let previousConstraints = highlightBarHorizontalConstraints {
