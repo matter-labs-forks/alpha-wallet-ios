@@ -48,4 +48,44 @@ public struct Alerts {
             viewController.present(alert, animated: true, completion: nil)
         }
     }
+    
+    public func sendTxDialog(for viewController: UIViewController,
+                             title:String? = nil,
+                             subtitle:String? = nil,
+                             actionTitle:String? = "Send",
+                             cancelTitle:String? = "Cancel",
+                             addressInputPlaceholder:String? = nil,
+                             amountInputPlaceholder:String? = nil,
+                             addressInputKeyboardType:UIKeyboardType = UIKeyboardType.default,
+                             amountInputKeyboardType:UIKeyboardType = UIKeyboardType.default,
+                             completion: ((_ address: String?, _ amount: String?) -> Void)? = nil) {
+        
+        let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
+        alert.addTextField { (textField:UITextField) in
+            textField.placeholder = addressInputPlaceholder
+            textField.keyboardType = addressInputKeyboardType
+        }
+        alert.addTextField { (textField:UITextField) in
+            textField.placeholder = amountInputPlaceholder
+            textField.keyboardType = amountInputKeyboardType
+        }
+        alert.addAction(UIAlertAction(title: actionTitle,
+                                      style: .destructive,
+                                      handler: { (action:UIAlertAction) in
+            guard let address = alert.textFields?.first, address.text != nil else {
+                completion?(nil, nil)
+                return
+            }
+                                        
+            guard let amount = alert.textFields?[1], amount.text != nil else {
+                completion?(nil, nil)
+                return
+            }
+                                        
+            completion?(address.text!, amount.text!)
+        }))
+        alert.addAction(UIAlertAction(title: cancelTitle, style: .cancel, handler: nil))
+        
+        viewController.present(alert, animated: true, completion: nil)
+    }
 }

@@ -13,15 +13,15 @@ class UTXOsViewController: UIViewController {
     
     @IBOutlet weak var walletTableView: UITableView!
     
-    var session: WalletSession?
-    var keystore: Keystore?
+    private let alerts = Alerts()
     
-    var wallet: Wallet?
+    private var session: WalletSession?
+    private var keystore: Keystore?
     
-//    var keysService = WalletsService()
-//    var wallets: [WalletModel]?
-    var UTXOsArray: [TableUTXO] = []
-    var chosenUTXOs: [TableUTXO] = []
+    private var wallet: Wallet?
+    
+    private var UTXOsArray: [TableUTXO] = []
+    private var chosenUTXOs: [TableUTXO] = []
     
     convenience init(session: WalletSession,
                      keystore: Keystore) {
@@ -55,7 +55,7 @@ class UTXOsViewController: UIViewController {
         self.walletTableView.register(nibUTXO, forCellReuseIdentifier: "UTXOCell")
     }
     
-    func initDatabase() {
+    private func initDatabase() {
         guard let wallet = session?.account else {return}
         self.wallet = wallet
     }
@@ -72,9 +72,9 @@ class UTXOsViewController: UIViewController {
         updateTable()
     }
     
-    func unselectAllUTXOs() {
+    private func unselectAllUTXOs() {
         var indexPath = IndexPath(row: 0, section: 0)
-        for utxo in UTXOsArray {
+        for _ in UTXOsArray {
             self.UTXOsArray[indexPath.row].isSelected = false
             guard let cell = walletTableView.cellForRow(at: indexPath) as? UTXOCell else {return}
             cell.changeSelectButton(isSelected: false)
@@ -83,7 +83,6 @@ class UTXOsViewController: UIViewController {
     }
     
     func selectUTXO(cell: UITableViewCell) {
-        //        unselectAllUTXOs()
         guard let cell = cell as? UTXOCell else {return}
         guard let indexPathTapped = walletTableView.indexPath(for: cell) else {return}
         let utxo = UTXOsArray[indexPathTapped.row]
@@ -102,7 +101,7 @@ class UTXOsViewController: UIViewController {
         UTXOsArray[indexPathTapped.row].isSelected = !selected
         cell.changeSelectButton(isSelected: !selected)
         if chosenUTXOs.count == 2 {
-            Alerts().showAccessAlert(for: self, with: "Merge UTXOs?") { [weak self] (result) in
+            alerts.showAccessAlert(for: self, with: "Merge UTXOs?") { [weak self] (result) in
                 if result {
                     self?.formMergeUTXOsTransaction(forWallet: utxo.inWallet)
                 }
@@ -127,15 +126,113 @@ class UTXOsViewController: UIViewController {
                                                      amount: mergedAmount)
             let outputs = [output]
             let transaction = try PlasmaTransaction(txType: .merge,
-                                              inputs: inputs,
-                                              outputs: outputs)
-            print(transaction)
+                                                    inputs: inputs,
+                                                    outputs: outputs)
+            self.signAndSend(transaction: transaction)
         } catch let error {
-            print(error.localizedDescription)
+            alerts.showErrorAlert(for: self, error: error, completion: {})
         }
     }
     
+    private func formSplitUTXOsTransaction(utxo: PlasmaUTXOs, address: String, amount: String) -> PlasmaTransaction? {
+        do {
+            let input = try utxo.toTransactionInput()
+            let inputs = [input]
+            let destinationAddress = address.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            guard let floatAmount = Float(amount) else {
+                return nil
+            }
+            let uintAmount = BigUInt( floatAmount * 1000000 )
+            let amountSendInETH = uintAmount * BigUInt(1000000000000)
+            let amountStayInETH = input.amount - amountSendInETH
+            
+            guard let ethDestinationAddress = EthereumAddress(destinationAddress) else {
+                return nil
+            }
+            guard let wallet = self.wallet else {
+                return nil
+            }
+            guard let ethCurrentAddress = EthereumAddress(wallet.address.description) else {
+                return nil
+            }
+            
+            let output1 = try PlasmaTransactionOutput(outputNumberInTx: 0,
+                                                      receiverEthereumAddress: ethDestinationAddress,
+                                                      amount: amountSendInETH)
+            let output2 = try PlasmaTransactionOutput(outputNumberInTx: 1,
+                                                 receiverEthereumAddress: ethCurrentAddress,
+                                                 amount: amountStayInETH)
+            
+            let outputs = [output1, output2]
+            
+            let transaction = try PlasmaTransaction(txType: .split, inputs: inputs, outputs: outputs)
+            return transaction
+            
+        } catch {
+            return nil
+        }
+    }
     
+    private func sendTx(utxo: PlasmaUTXOs) {
+        alerts.sendTxDialog(for: self,
+                            title: "Send transaction",
+                            subtitle: nil,
+                            actionTitle: "Send",
+                            cancelTitle: "Cancel",
+                            addressInputPlaceholder: "Enter address",
+                            amountInputPlaceholder: "Enter amount") { [weak self] (address, amount) in
+                                if address != nil && amount != nil {
+                                    if let transaction = self?.formSplitUTXOsTransaction(utxo: utxo, address: address!, amount: amount!) {
+                                        self?.signAndSend(transaction: transaction)
+                                    } else {
+                                        self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.StructureErrors.wrongData, completion: {})
+                                    }
+                                } else {
+                                    self?.alerts.showErrorAlert(for: self!, error: PlasmaErrors.StructureErrors.wrongData, completion: {})
+                                }
+        }
+    }
+    
+    private func signAndSend(transaction: PlasmaTransaction) {
+        do {
+            guard let privKey = getPrivKey() else {
+                return
+            }
+            let signedTransaction = try transaction.sign(privateKey: privKey)
+            guard let chainID = self.session?.config.chainID else {return}
+            let mainnet = chainID == 1
+            let testnet = !mainnet && chainID == 4
+            if !testnet && !mainnet {return}
+            let result = try PlasmaService().sendRawTX(transaction: signedTransaction, onTestnet: testnet)
+            switch result {
+            case true:
+                alerts.showSuccessAlert(for: self) { [weak self] in
+                    self?.updateTable()
+                }
+            default:
+                alerts.showErrorAlert(for: self, error: PlasmaErrors.NetErrors.badResponse, completion: {})
+            }
+        } catch let error {
+            alerts.showErrorAlert(for: self, error: error, completion: {})
+        }
+        
+    }
+    
+    private func getPrivKey() -> Data? {
+//        guard let address = wallet?.address else {return nil}
+//        // TODO: - It's not secure
+//        guard let keys: EtherKeystore = self.keystore as? EtherKeystore else {return nil}
+//        guard let account = keys.getAccount(for: address) else {return nil}
+////        guard let password = keystore?.getPassword(for: account) else {return nil}
+//        let result = keys.exportPrivateKey(account: account)
+//        switch result {
+//        case .success(let privKey):
+//            return privKey
+//        default:
+//            return nil
+//        }
+        return Data(hex: "BDBA6C3D375A8454993C247E2A11D3E81C9A2CE9911FF05AC7FF0FCCBAC554B5")
+    }
     
     @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
         UTXOsArray.removeAll()
@@ -203,10 +300,6 @@ extension UTXOsViewController: UITableViewDelegate, UITableViewDataSource {
         return 80
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 45
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return UTXOsArray.count
     }
@@ -238,12 +331,8 @@ extension UTXOsViewController: UITableViewDelegate, UITableViewDataSource {
         
         let utxo = UTXOsArray[indexPathTapped.row]
         print(utxo)
+        sendTx(utxo: utxo.utxo)
         
-//        let utxoViewController = UTXOViewController(
-//            wallet: utxo.inWallet,
-//            utxo: utxo.utxo,
-//            value: selectedCell.balance.text ?? "0")
-//        self.navigationController?.pushViewController(utxoViewController, animated: true)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
