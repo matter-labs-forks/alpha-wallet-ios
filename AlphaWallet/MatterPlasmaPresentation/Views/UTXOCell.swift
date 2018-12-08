@@ -12,7 +12,8 @@ class UTXOCell: UITableViewCell {
 
     @IBOutlet weak var bottomBackgroundView: UIView!
     @IBOutlet weak var balance: UILabel!
-
+    @IBOutlet weak var block: UILabel!
+    
     var link: UTXOsViewController?
 
     override func awakeFromNib() {
@@ -29,6 +30,7 @@ class UTXOCell: UITableViewCell {
                                                         return
         }
         self.balance.text = balance + " ETH"
+        self.block.text = "Block: " + utxo.blockNumber.description
     }
 
     func changeSelectButton(isSelected: Bool) {
@@ -44,5 +46,6 @@ class UTXOCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         self.balance.text = ""
+        self.block.text = ""
     }
 }

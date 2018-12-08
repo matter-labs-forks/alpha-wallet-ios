@@ -21,18 +21,29 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cqq-1U-WXE" userLabel="BottomBackgroundView">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="147.5"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="3f7-lk-WzA">
-                                <rect key="frame" x="20" y="10" width="335" height="127.5"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="19"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="..." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="3f7-lk-WzA">
+                                <rect key="frame" x="20" y="62" width="150" height="24"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Block" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="Cjd-ar-FmI">
+                                <rect key="frame" x="205" y="62" width="150" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="c60-1n-J89"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="3f7-lk-WzA" secondAttribute="trailing" constant="20" id="N0V-Xw-B9Z"/>
-                            <constraint firstAttribute="bottom" secondItem="3f7-lk-WzA" secondAttribute="bottom" constant="10" id="NqZ-GM-zZu"/>
+                            <constraint firstItem="3f7-lk-WzA" firstAttribute="centerY" secondItem="cqq-1U-WXE" secondAttribute="centerY" id="3XY-hm-EkJ"/>
+                            <constraint firstItem="Cjd-ar-FmI" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="3f7-lk-WzA" secondAttribute="trailing" constant="20" id="7TT-Np-9K7"/>
+                            <constraint firstAttribute="trailing" secondItem="Cjd-ar-FmI" secondAttribute="trailing" constant="20" id="G0O-BJ-cLA"/>
+                            <constraint firstItem="Cjd-ar-FmI" firstAttribute="centerY" secondItem="3f7-lk-WzA" secondAttribute="centerY" id="OOF-sv-mqy"/>
                             <constraint firstItem="3f7-lk-WzA" firstAttribute="leading" secondItem="cqq-1U-WXE" secondAttribute="leading" constant="20" id="Ww0-f8-Bl3"/>
-                            <constraint firstItem="3f7-lk-WzA" firstAttribute="top" secondItem="cqq-1U-WXE" secondAttribute="top" constant="10" id="ckj-Te-Zt5"/>
+                            <constraint firstItem="3f7-lk-WzA" firstAttribute="width" secondItem="Cjd-ar-FmI" secondAttribute="width" id="ufq-Ri-shu"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -56,6 +67,7 @@
             </accessibility>
             <connections>
                 <outlet property="balance" destination="3f7-lk-WzA" id="1CH-Kz-v7C"/>
+                <outlet property="block" destination="Cjd-ar-FmI" id="YQK-CL-jX9"/>
                 <outlet property="bottomBackgroundView" destination="cqq-1U-WXE" id="Hfp-2x-scq"/>
             </connections>
             <point key="canvasLocation" x="53.600000000000001" y="48.575712143928037"/>

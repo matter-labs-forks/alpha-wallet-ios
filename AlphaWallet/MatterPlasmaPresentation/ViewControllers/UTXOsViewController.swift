@@ -12,6 +12,7 @@ import BigInt
 class UTXOsViewController: UIViewController {
     
     @IBOutlet weak var walletTableView: UITableView!
+    @IBOutlet weak var balanceLabel: UILabel!
     
     private let alerts = Alerts()
     private let plasmaTxService = PlasmaTransactionsService()
@@ -44,6 +45,7 @@ class UTXOsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tabBarController?.tabBar.selectedItem?.title = nil
+        self.setBalance()
         self.setupTableView()
     }
     
@@ -54,6 +56,13 @@ class UTXOsViewController: UIViewController {
         self.walletTableView.tableFooterView = UIView()
         self.walletTableView.addSubview(self.refreshControl)
         self.walletTableView.register(nibUTXO, forCellReuseIdentifier: "UTXOCell")
+    }
+    
+    private func setBalance() {
+        guard let balance = session?.balance?.amountShort else {
+            return
+        }
+        self.balanceLabel.text = "Balance: " + balance + " ETH"
     }
     
     private func initDatabase() {
@@ -233,6 +242,14 @@ extension UTXOsViewController: UITableViewDelegate, UITableViewDataSource {
         return 1
     }
     
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "UTXOs list"
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 50
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
     }
@@ -271,6 +288,15 @@ extension UTXOsViewController: UITableViewDelegate, UITableViewDataSource {
         sendTx(utxo: utxo.utxo)
         
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let utxo = UTXOsArray[indexPath.row]
+        let exit = UITableViewRowAction(style: .destructive, title: "Exit") { [weak self] (action, indexPath) in
+            self?.updateTable()
+        }
+        exit.backgroundColor = UIColor.blue
+        return [exit]
     }
     
 }
